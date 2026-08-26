@@ -31,6 +31,13 @@ def retrieve_name_detail(name_id:int):
             return name
     return {"detail":"object not found!"}
 
+@app.put("/names/{name_id}")
+def update_name_detail(name_id:int, name:str):
+    for item in names_list:
+        if item["id"] == name_id: 
+            item["name"] = name 
+            return item
+    return {"detail":"object not found!"}
 
 @app.get("/")
 def root():
