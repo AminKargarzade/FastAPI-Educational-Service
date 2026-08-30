@@ -20,7 +20,7 @@ names_list = [
 # def retrieve_names_list(q : str | None = None):
 # def retrieve_names_list(q : Optional[str] = None):
 # def retrieve_names_list(q : Annotated[str | None, Query(max_length=50)] = None):
-def retrieve_names_list(q : str | None = Query(default=None, max_length=50)):
+def retrieve_names_list(q : str | None = Query(deprecated=True,alias="search",description="it will be searched with the name you provided",example="Andreas",default=None, max_length=50)):
     if q:
         return [item for item in names_list if item["name"] == q] # [operation iteration condition]        
     return names_list
