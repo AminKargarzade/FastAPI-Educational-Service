@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, status, HTTPException
+from fastapi import FastAPI, Query, status, HTTPException, Path
 from typing import Annotated, Optional
 from fastapi.responses import JSONResponse
 import random
@@ -34,7 +34,7 @@ def create_name(name:str):
 
 # /names/:id (GET(RETRIEVE), PUT/PATCH(UPDATE), DELETE)
 @app.get("/names/{name_id}")
-def retrieve_name_detail(name_id:int):
+def retrieve_name_detail(name_id:int = Path(alias="object_id",title="object id", description="the ID of the name in names_list")):
     for name in names_list:
         if name["id"] == name_id:
             return name
