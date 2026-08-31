@@ -15,7 +15,20 @@ from fastapi.responses import JSONResponse
 import random
 from typing import List
 
-app = FastAPI()
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Starting Events
+    print("Application Startup babay")
+    # For ex. Connecting to the Database or Initialization of Cache
+    yield # This line gives the running program to the Application 
+    
+    # Shutting down events
+    print("Application ShutDown honey")
+    # For ex. closing the connection to the database or Cleaning the resources
+
+app = FastAPI(lifespan=lifespan)
 
 names_list = [
     {"id": 1, "name": "amin"},
@@ -26,6 +39,16 @@ names_list = [
     {"id": 6, "name": "amin"},
     {"id": 7, "name": "amin"},
 ]
+
+# @app.on_event("startup")
+# async def startup_event():
+#     print("starting the application")
+                                            # This is used before the version    ^
+                                            # 0.95.00 now we have something new  | (Lookup)
+                                            # that is called (lifespan)          |
+# @app.on_event("shutdown")
+# async def shutdown_event():
+#     print("shuttingdown the application")
 
 
 # /names (GET(RETRIEVE), POST(CREATE))
