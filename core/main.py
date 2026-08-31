@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, status, HTTPException, Path, Form
+from fastapi import FastAPI, Query, status, HTTPException, Path, Form, Body
 
 # from typing import Annotated, Optional
 from fastapi.responses import JSONResponse
@@ -40,7 +40,7 @@ def retrieve_names_list(
 
 
 @app.post("/names", status_code=status.HTTP_201_CREATED)
-def create_name(name: str = Form()):
+def create_name(name: str = Body(embed=True)):
     name_obj = {"id": random.randint(6, 100), "name": name}  # type: ignore
     names_list.append(name_obj)
     return name_obj
