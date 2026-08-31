@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Query, status, HTTPException, Path, Form, Body
+from fastapi import FastAPI, Query, status, HTTPException, Path, Form, Body, File, UploadFile
 
 # from typing import Annotated, Optional
 from fastapi.responses import JSONResponse
 import random
+from typing import List
 
 app = FastAPI()
 
@@ -92,3 +93,21 @@ def delete_name(name_id: int):
 def root():
     content = {"message": "Hello, World!"}
     return JSONResponse(content=content, status_code=status.HTTP_202_ACCEPTED)
+
+
+# @app.post("/upload_file/")
+# async def upload_file(file: bytes = File(...)):
+#     print(file)
+#     return {"file_size": len(file)}
+
+@app.post("/upload_file/")
+async def upload_file(file: UploadFile = File(...)):
+    content = await file.read() # Asynchronous reading !
+    return {"filename": file.filename, "content_type": file.content_type, "file_size": len(content)}
+
+@app.post("/upload-multiple/")
+async def upload_multiple(files: List[UploadFile]):
+    return [
+        {"filename": file.filename, "content_type": file.content_type}
+        for file in files
+    ]
