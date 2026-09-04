@@ -72,10 +72,22 @@ def retrieve_names_list(
         ]  # [operation iteration condition]
     return names_list
 
+from dataclasses import dataclass
+@dataclass
+class Student:
+    name: str
+    age: int
+    
+@dataclass
+class StudentResponse:
+    id: int
+    name: str
+    age: int
 
-@app.post("/names", status_code=status.HTTP_201_CREATED)
-def create_name(name: str = Body(embed=True)):
-    name_obj = {"id": random.randint(6, 100), "name": name}  # type: ignore
+@app.post("/names", status_code=status.HTTP_201_CREATED, response_model=StudentResponse)
+# def create_name(name: str = Body(embed=True)):
+def create_name(student: Student):
+    name_obj = {"id": random.randint(6, 100), "name": student.name}  # type: ignore
     names_list.append(name_obj)
     return name_obj
 
