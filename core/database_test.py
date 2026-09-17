@@ -1,5 +1,6 @@
 from sqlalchemy import (
     ForeignKey,
+    Text,
     create_engine,
     Column,
     Integer,
@@ -37,6 +38,8 @@ class User(Base):
     is_verified = Column(Boolean, default=False)
 
     adresses = relationship("Address", backref="user")
+    
+    profile = relationship("Profile", backref="user", uselist=False)  # uselist=False indicates a one-to-one relationship
 
     def __repr__(self):
         return f"User(id={self.id}, username={self.username}, email={self.email}, is_active={self.is_active}, is_verified={self.is_verified})"
@@ -58,28 +61,29 @@ class Address(Base):
         return f"Address(id={self.id}, user_id={self.user_id}, city={self.city}, state={self.state}, zip_code={self.zip_code})"
 
 
+class Profile(Base):
+    __tablename__ = "profiles"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+    # Alternative best practice 
+    # user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)  # This will make user_id the primary key of the Profile table, ensuring a one-to-one relationship with the User table.
+
+    first_name = Column(String())
+    last_name = Column(String())
+    bio = Column(Text(), nullable=True)
+
+    def __repr__(self):
+        return f"Profile(id={self.id}, user_id={self.user_id}, first_name={self.first_name}, last_name={self.last_name}, bio={self.bio})"
+
+
 # to create tables and database
 Base.metadata.create_all(engine)
 
 session = SessionLocal()
 
-
-# session.add(User(username="AminRastin", email="aminkargarzadeh26@gmail.com", password="hashed_password"))
-# session.commit()
-
 user = session.query(User).filter_by(username="AminRastin").one_or_none()
 
-# addresses = [
-#     Address(user_id=user.id, city="New York", state="NY", zip_code="10001"),
-#     Address(user_id=user.id, city="Los Angeles", state="CA", zip_code="90210")
-# ]
-
-# session.add_all(addresses)
+# session.add(Profile(user_id=user.id, first_name="Amin", last_name="Rastin", bio="Software Engineer"))
 # session.commit()
-# print(user.adresses)  # Accessing the related Address objects through the relationship
-address = (
-    session.query(Address).filter_by(user_id=user.id, city="New York").one_or_none()
-)
-print(
-    address.user.username
-)  # Accessing the related User object through the relationship
+print(user.profile.first_name) # This will print the profile associated with the user, if it exists.
