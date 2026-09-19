@@ -3,7 +3,9 @@ from datetime import datetime
 from sqlalchemy import (
     DateTime,
     ForeignKey,
+    Table,
     Text,
+    UniqueConstraint,
     create_engine,
     Column,
     Integer,
@@ -30,6 +32,16 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
+enrollments = Table(
+    "enrollments",
+    Base.metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("user_id", Integer, ForeignKey("users.id")),
+    Column("course_id", Integer, ForeignKey("courses.id")),
+    Column("enrolled_date", DateTime(), default=datetime.now),
+    UniqueConstraint("user_id", "course_id", name="unique_user_course_enrolled")
+)
+
 class User(Base):
     __tablename__ = "users"
 
@@ -40,12 +52,13 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_verified = Column(Boolean, default=False)
 
-    adresses = relationship("Address", backref="user")
+    addresses = relationship("Address", backref="user")
     posts = relationship("Post", backref="user")
     comments = relationship("Comment", backref="user")
     profile = relationship(
         "Profile", backref="user", uselist=False
     )  # uselist=False indicates a one-to-one relationship
+    courses = relationship("Course", secondary=enrollments, back_populates="attendees")
 
     def __repr__(self):
         return f"User(id={self.id}, username={self.username}, email={self.email}, is_active={self.is_active}, is_verified={self.is_verified})"
@@ -129,15 +142,29 @@ class Comment(Base):
         return f"Comment(id={self.id}, post_id={self.post_id}, user_id={self.user_id}, parent_id={self.parent_id}, content={self.content})"
 
 
+class Course(Base):
+    __tablename__ = "courses"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    title = Column(String())
+    description = Column(Text())
+    created_date = Column(DateTime(), default=datetime.now)
+    
+    attendees = relationship("User", secondary=enrollments, back_populates="courses") 
+
+    def __repr__(self):
+        return f"Course(id={self.id}, title={self.title}, description={self.description})"
+
 # to create tables and database
 Base.metadata.create_all(engine)
 
 session = SessionLocal()
 
 user = session.query(User).filter_by(username="AminRastin").one_or_none()
-post = user.posts[0]
+course = session.query(Course).filter_by(title="Java Programming").one()
 
-comments = session.query(Comment).filter_by(post_id=post.id, parent_id=None).all()
+# course.attendees.append(user)
+# session.commit()
 
-for comment in comments:
-    print(comment.children)
+# print(course.attendees)  # should print the list of users enrolled in the course
+print(user.courses)
