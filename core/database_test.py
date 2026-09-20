@@ -39,8 +39,9 @@ enrollments = Table(
     Column("user_id", Integer, ForeignKey("users.id")),
     Column("course_id", Integer, ForeignKey("courses.id")),
     Column("enrolled_date", DateTime(), default=datetime.now),
-    UniqueConstraint("user_id", "course_id", name="unique_user_course_enrolled")
+    UniqueConstraint("user_id", "course_id", name="unique_user_course_enrolled"),
 )
+
 
 class User(Base):
     __tablename__ = "users"
@@ -149,11 +150,14 @@ class Course(Base):
     title = Column(String())
     description = Column(Text())
     created_date = Column(DateTime(), default=datetime.now)
-    
-    attendees = relationship("User", secondary=enrollments, back_populates="courses") 
+
+    attendees = relationship("User", secondary=enrollments, back_populates="courses")
 
     def __repr__(self):
-        return f"Course(id={self.id}, title={self.title}, description={self.description})"
+        return (
+            f"Course(id={self.id}, title={self.title}, description={self.description})"
+        )
+
 
 # to create tables and database
 Base.metadata.create_all(engine)
