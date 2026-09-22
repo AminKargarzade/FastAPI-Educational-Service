@@ -20,6 +20,7 @@ class Person(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(30))
+    age = Column(Integer())
 
 
 def get_db():
