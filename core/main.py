@@ -25,7 +25,6 @@ from schemas import PersonCreateSchema, PersonResponseSchema, PersonUpdateSchema
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Application Startup babay")
-    Base.metadata.create_all(engine)
     yield
     print("Application ShutDown honey")
 
